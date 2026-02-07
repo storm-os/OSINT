@@ -1089,16 +1089,16 @@ ua = json.loads('''{"browsers": {"chrome": [
                                           "210": "chrome",
                                           "211": "chrome",
                                           "762": "chrome",
-                                        "763": "chrome" 
-                                        "760": "chrome" 
+                                        "763": "chrome",
+                                        "760": "chrome",
                                         "761": "chrome",
                                         "766": "chrome",
                                         "767": "chrome",
                                         "764": "chrome",
                                         "765": "chrome" 
                                         "40": "chrome",
-                                        "41": "chrome" 
-                                        "289": "chrome" 
+                                        "41": "chrome",
+                                        "289": "chrome",
                                         "288": "chrome",
                                         "4": "chrome",
                                         "281": "chrome",
@@ -1143,8 +1143,8 @@ ua = json.loads('''{"browsers": {"chrome": [
                                         "258": "chrome",
                                         "53": "chrome",
                                         "52": "chrome",
-                                        "537": "chrome"
-                                        , "536": "chrome", 
+                                        "537": "chrome",
+                                        "536": "chrome", 
                                         "535": "chrome",
                                         "63": "chrome",
                                         "533": "chrome", 

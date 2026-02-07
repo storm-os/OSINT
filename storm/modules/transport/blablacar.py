@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def blablacar(email, client, out):
@@ -24,11 +24,14 @@ async def blablacar(email, client, out):
         'TE': 'Trailers',
     }
     try:
-        appToken = await client.get(
-            "https://www.blablacar.fr/register",
-            headers=headers)
-        appToken = appToken.text.split('"appToken":"')[1].split('"')[0]
-
+        req = await client.get("https://www.blablacar.fr/register", headers=headers)
+    
+        match = re.search(r'["\']appToken["\']\s*:\s*["\']([^"\']+)["\']', req.text)
+        if match:
+            app_token = match.group(1)
+            headers["X-App-Token"] = app_token 
+        else:
+            raise ValueError("BlaBlaCar App Token not found")
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

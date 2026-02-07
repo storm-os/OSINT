@@ -20,8 +20,15 @@ async def atlassian(email, client, out):
     }
     try:
         r = await client.get("https://id.atlassian.com/login", headers=headers)
-        data = {'csrfToken': r.text.split('{&quot;csrfToken&quot;:&quot;')[
-            1].split('&quot')[0], 'username': email}
+        decoded_text = html.unescape(r.text)
+        match = re.search(r'csrfToken["\']?\s*[:=]\s*["\']?([^"\'\s&>]+)', decoded_text)
+        if match:
+            csrf_token = match.group(1)
+            data = {'csrfToken': csrf_token, 'username': email}
+        else:
+            # Fallback if the pattern changes completely
+            print("[!] Atlassian CSRF Pattern mismatch. Manual check required.")
+            data = {'username': email}
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

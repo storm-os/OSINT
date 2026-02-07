@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 from string import ascii_lowercase, printable
 
 async def tumblr(email, client, out):

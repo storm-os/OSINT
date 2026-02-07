@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def google(email, client, out):
@@ -26,8 +26,21 @@ async def google(email, client, out):
         "https://accounts.google.com/signup/v2/webcreateaccount?continue=https%3A%2F%2Faccounts.google.com%2FManageAccount%3Fnc%3D1&gmb=exp&biz=false&flowName=GlifWebSignIn&flowEntry=SignUp",
         headers=headers)
     try:
-        freq = req.text.split('quot;,null,null,null,&quot;')[
-            1].split('&quot')[0]
+        if "denied" in req.text.lower() or "captcha" in req.text.lower():
+            print("[!] Google detected bot activity (CAPTCHA/Blocked).")
+            out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
+                    "rateLimit": True,
+                    "exists": False,
+                    "emailrecovery": None,
+                    "phoneNumber": None,
+                    "others": None})
+            return None
+
+        token_match = re.search(r'quot;,(?:null,)+&quot;([^&]+)&quot;', req.text)
+        if token_match:
+            freq = token_match.group(1)
+        else:
+            freq = req.text.split('quot;,null,null,null,&quot;')[1].split('&quot')[0]
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

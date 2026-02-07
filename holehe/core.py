@@ -100,11 +100,7 @@ async def storm_entry(email):
     out = sorted(out, key=lambda i: i['name'])
     await client.aclose()
 
-    # Tampilkan Output (Masih menggunakan gaya Holehe asli)
     print_result(out, args, email, start_time, websites)
 
-    # Kembalikan data murni ke StormOS jika ingin diolah ke Server 70TB
+    # Kembalikan data murni ke StormOS jika ingin diolah ke Server
     return out
-
-# Contoh cara panggil dari script eksternal/StormOS:
-# trio.run(storm_entry, "target@email.com")

@@ -1,8 +1,9 @@
 import trio
 import sys
+
 # Pastikan folder holehe hasil modifikasi kamu bisa diakses
-# Misal: sys.path.append('./plugins/holehe') 
-from holehe.core import storm_entry 
+# Misal: sys.path.append('./plugins/holehe')
+from holehe.core import storm_entry
 
 class StormOSModuleRunner:
     """
@@ -29,7 +30,7 @@ class StormOSModuleRunner:
     def run_module(self):
         """Logika perintah 'run' di StormOS"""
         email = self.options['EMAIL']['value']
-        
+
         if not email:
             print("[-] Error: Option EMAIL harus diisi sebelum menjalankan 'run'!")
             return
@@ -44,24 +45,14 @@ class StormOSModuleRunner:
             # Setelah selesai, data mentah ada di variabel raw_data
             # Kamu bisa mengirimnya ke server 70TB di sini
             self.save_to_big_data(raw_data)
-            
+
         except Exception as e:
             print(f"[!] Terjadi kesalahan saat eksekusi: {e}")
 
     def save_to_big_data(self, data):
         """Logika khusus untuk berinteraksi dengan server 70TB kamu"""
         detected_count = len([x for x in data if x['exists']])
-        print(f"[*] Sinkronisasi {detected_count} temuan ke Server Pusat (70TB)...")
+        print(f"[*] Sinkronisasi {detected_count} temuan ke data center")
         # Di sini masukkan library C/C++ kamu atau API call ke server pusat
         pass
 
-# --- SIMULASI PENGGUNAAN DI TERMINAL STORMOS ---
-if __name__ == "__main__":
-    storm = StormOSModuleRunner()
-    
-    # User mengetik: set email target@gmail.com
-    storm.set_option("email", "target@gmail.com")
-    
-    # User mengetik: run
-    storm.run_module()
-          

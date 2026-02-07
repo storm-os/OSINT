@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def vivino(email, client, out):
@@ -20,12 +20,20 @@ async def vivino(email, client, out):
     }
 
     try:
-        r = await client.get("https://www.tunefind.com/user/join", headers=headers)
-        crsf_token = r.text.split('"csrf-token" content="')[1].split('"')[0]
-        headers['X-CRSF-Token'] = crsf_token
-        data = '{"email":"' + str(email) + '","password":"e"}'
-
-        response = await client.post('https://www.vivino.com/api/login', headers=headers, data=data)
+        r = await client.get("https://www.vivino.com/users/sign_up", headers=headers)
+        
+        match = re.search(r'name="csrf-token" content="([^"]+)"', r.text) 
+        if match:
+            actual_token = match.group(1)
+            headers['X-CSRF-Token'] = actual_token
+        else:
+            raise ValueError("Failed to fetch Vivino's actual CSRF token.")
+            
+        response = await client.post(
+                'https://www.vivino.com/api/login', 
+                 headers=headers, 
+                 data=data
+        )
         if response.status_code == 429:
             out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                         "rateLimit": True,

@@ -11,13 +11,18 @@ setup(
         "bs4",
         "httpx",
         "trio",
-        "colorama"
-        # "tqdm" bisa dihapus jika StormOS punya progress bar sendiri
+        "colorama",
+        "tqdm"
     ],
-    description="OSINT module for StormOS Framework",
+    description="This OSINT is just a separate module from Storm Framework.",
     include_package_data=True,
+    url=[
+        "http://github.com/megadose/holehe",
+        "http://github.com/storm-os/OSINT",
+        "http://github.com/storm-os/Cyber-Pentest"
+    ],
     classifiers=[
         "Programming Language :: Python",
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
     ],
 )

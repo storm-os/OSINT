@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def codecademy(email, client, out):
@@ -19,13 +19,16 @@ async def codecademy(email, client, out):
         'Connection': 'keep-alive',
         'TE': 'Trailers',
     }
-    req = await client.get(
-        "https://www.codecademy.com/register?redirect=%2F",
-        headers=headers)
-    soup = BeautifulSoup(req.content, features="html.parser")
     try:
-        headers["X-CSRF-Token"] = soup.find(
-            attrs={"name": "csrf-token"}).get("content")
+        req = await client.get("https://www.codecademy.com/register?redirect=%2F", headers=headers)
+        soup = BeautifulSoup(req.content, "html.parser")
+    
+        csrf_meta = soup.find("meta", attrs={"name": "csrf-token"})
+    
+        if csrf_meta and csrf_meta.get("content"):
+            headers["X-CSRF-Token"] = csrf_meta.get("content")
+        else:
+            raise ValueError("Codecademy CSRF Token not found")
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

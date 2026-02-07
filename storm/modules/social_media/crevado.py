@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def crevado(email, client, out):
@@ -19,7 +19,7 @@ async def crevado(email, client, out):
         'TE': 'Trailers',
     }
     try:
-        req = await client.get("https://crevado.com")
+        req = await client.get("https://crevado.com/")
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,
@@ -28,8 +28,16 @@ async def crevado(email, client, out):
                     "phoneNumber": None,
                     "others": None})
         return()
-    token = req.text.split(
-        '<meta name="csrf-token" content="')[1].split('"')[0]
+        
+    token_match = re.search(r'<meta[^>]*?name=["\']csrf-token["\'][^>]*?content=["\']([^"\']+)["\']', req.text)
+    if not token_match:
+        token_match = re.search(r'<meta[^>]*?content=["\']([^"\']+)["\'][^>]*?name=["\']csrf-token["\']', req.text)
+
+    if token_match:
+        token = token_match.group(1)
+        headers["X-CSRF-Token"] = token
+    else:
+        raise ValueError("Crevado CSRF Token not found")
 
     data = {
         'utf8': '\u2713',

@@ -1,4 +1,5 @@
-from storm.localuseragent import ua
+from storm.localuseragent import *
+from storm.core import *
 import random
 import string
 import requests  # Adjust if using a different HTTP library

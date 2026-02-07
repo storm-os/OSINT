@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def smule(email, client, out):
@@ -20,10 +20,15 @@ async def smule(email, client, out):
 
     try:
         r = await client.get('https://www.smule.com/user/check_email', headers=headers)
-        csrf_token = (
-            r.text.split(
-                'authenticity_token" name="csrf-param" />\n<meta content="')
-            [1]).split('"')[0]
+        match = re.search(r'meta content="([^"]+)" name="csrf-token"', r.text)
+    
+        if not match:
+            match = re.search(r'name="csrf-token" content="([^"]+)"', r.text)
+    
+        if match:
+            csrf_token = match.group(1)
+        else:
+            csrf_token = r.text.split('content="')[1].split('"')[0]
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

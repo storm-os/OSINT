@@ -7,18 +7,9 @@ class StormOSModuleRunner:
     """
     This class can only be run on Storm Framework
     """
-    def __init__(self):
-        self.options = {
-            "EMAIL": {
-                "value": "",
-                "required": True,
-                "description": "Register"
-            }
-        }
-
-    def run_module(self):
+    def run_module(options):
         """This logic relates to Storm Framework commands and inputs."""
-        email = self.options['EMAIL']['value']
+        email = run.options("EMAIL")
 
         try:
             raw_data = trio.run(storm_entry, email)

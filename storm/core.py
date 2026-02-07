@@ -81,7 +81,7 @@ async def storm_entry(email):
         return
 
     args = StormArgs()
-    modules = import_submodules("holehe.modules")
+    modules = import_submodules("storm.modules")
     websites = get_functions(modules, args)
 
     start_time = time.time()

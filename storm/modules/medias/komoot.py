@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from store.localuseragent import *
 
 
 async def komoot(email, client, out):

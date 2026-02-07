@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def envato(email, client, out):
@@ -46,3 +46,4 @@ async def envato(email, client, out):
                     "emailrecovery": None,
                     "phoneNumber": None,
                     "others": None})
+

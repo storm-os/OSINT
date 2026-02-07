@@ -9,12 +9,12 @@ from holehe.instruments import TrioProgress
 
 EMAIL_FORMAT = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
-# Class dummy untuk menggantikan argparse agar fungsi print_result tetap jalan
+
 class StormArgs:
     def __init__(self):
         self.onlyused = False
         self.nocolor = False
-        self.noclear = True # Biar tidak menghapus layar StormOS
+        self.noclear = True
         self.nopasswordrecovery = False
         self.timeout = 10
 
@@ -64,7 +64,7 @@ def print_result(data, args, email, start_time, websites):
     print(f"{len(websites)} websites checked in {round(time.time() - start_time, 2)} seconds")
 
 async def launch_module(module, email, client, out):
-    # Dictionary mapping domain (disingkat untuk efisiensi)
+    # Dictionary mapping domain
     try:
         await module(email, client, out)
     except Exception:
@@ -73,8 +73,8 @@ async def launch_module(module, email, client, out):
 
 async def storm_entry(email):
     """
-    LOGIKA UTAMA UNTUK STORMOS
-    Panggil fungsi ini dari logika 'run' kamu.
+    MAIN LOGIC FOR Storm Framework
+    This logic is connected to storm.py in the root folder.
     """
     if not bool(re.fullmatch(EMAIL_FORMAT, email)):
         print("[-] Format Email Salah!")
@@ -101,6 +101,4 @@ async def storm_entry(email):
     await client.aclose()
 
     print_result(out, args, email, start_time, websites)
-
-    # Kembalikan data murni ke StormOS jika ingin diolah ke Server
     return out

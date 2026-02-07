@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def teamtreehouse(email, client, out):
@@ -20,13 +20,25 @@ async def teamtreehouse(email, client, out):
         'Connection': 'keep-alive',
         'TE': 'Trailers',
     }
+    try:
+        req = await client.get("https://teamtreehouse.com/subscribe/new?trial=yes", headers=headers)
+        soup = BeautifulSoup(req.content, "html.parser")
+    
+        csrf_tag = soup.find("meta", attrs={"name": "csrf-token"})
+        if csrf_tag and csrf_tag.has_attr('content'):
+            token = csrf_tag["content"]
+            headers['X-CSRF-Token'] = token
+        else:
+            raise ValueError("Team Treehouse CSRF Token not found")
+    except Exception:
+        out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
+                    "rateLimit": True,
+                    "exists": False,
+                    "emailrecovery": None,
+                    "phoneNumber": None,
+                    "others": None})
+        return None
 
-    req = await client.get(
-        "https://teamtreehouse.com/subscribe/new?trial=yes",
-        headers=headers)
-    soup = BeautifulSoup(req.content, features="html.parser")
-    token = soup.find(attrs={"name": "csrf-token"}).get("content")
-    headers['X-CSRF-Token'] = token
 
     data = {
         'email': email

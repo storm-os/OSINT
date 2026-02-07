@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def strava(email, client, out):
@@ -19,8 +19,18 @@ async def strava(email, client, out):
 
     r = await client.get("https://www.strava.com/register/free?cta=sign-up&element=button&source=website_show", headers=headers)
     try:
-        headers['X-CSRF-Token'] = r.text.split(
-            '<meta name="csrf-token" content="')[1].split('"')[0]
+        pattern = r'<meta[^>]*?name=["\']csrf-token["\'][^>]*?content=["\']([^"\']+)["\']'
+        match = re.search(pattern, r.text)
+        if not match:
+            pattern_alt = r'<meta[^>]*?content=["\']([^"\']+)["\'][^>]*?name=["\']csrf-token["\']'
+            match = re.search(pattern_alt, r.text)
+
+        if match:
+            csrf_token = match.group(1)
+            headers['X-CSRF-Token'] = csrf_token
+            headers['X-Requested-With'] = 'XMLHttpRequest'
+        else:
+            raise ValueError("Strava CSRF Token not found - Possible WAF protection")
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

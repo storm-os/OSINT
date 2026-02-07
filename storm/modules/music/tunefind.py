@@ -1,7 +1,19 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
+def deep_csrf_search(html_content):
+    patterns = [
+        r'csrf-token"\s+content="([^"]+)"',
+        r'content="([^"]+)"\s+name="csrf-token"',
+        r'csrf_token["\']?\s*[:=]\s*["\']([^"\']+)'
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, html_content)
+        if match:
+            return match.group(1)
+    return None
+    
 async def tunefind(email, client, out):
     name = "tunefind"
     domain = "tunefind.com"
@@ -18,7 +30,17 @@ async def tunefind(email, client, out):
     }
     r = await client.get("https://www.tunefind.com/user/join", headers=headers)
     try:
-        crsf_token = r.text.split('"csrf-token" content="')[1].split('"')[0]
+        html_content = r.text
+        
+        pattern = r'<(?:meta|input)[^>]*?(?:name|id)=["\']csrf-token["\'][^>]*?content=["\']([^"\']+)["\']'
+        match = re.search(pattern, html_content)
+
+        if not match:
+            pattern_alt = r'<(?:meta|input)[^>]*?content=["\']([^"\']+)["\'][^>]*?(?:name|id)=["\']csrf-token["\']'
+            match = re.search(pattern_alt, html_content)
+
+        if match:
+            csrf_token = match.group(1)
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

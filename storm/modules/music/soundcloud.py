@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 async def soundcloud(email, client, out):
     name = "soundcloud"
@@ -14,8 +14,20 @@ async def soundcloud(email, client, out):
         }
 
     getAuth = await client.get('https://soundcloud.com/octobersveryown', headers=headers)
-    script = BeautifulSoup(getAuth.text, 'html.parser').find_all('script')[4]
-    clientId = json.loads(script.contents[0])["runtimeConfig"]["clientId"]
+    soup = BeautifulSoup(getAuth.text, 'html.parser')
+
+    clientId = None
+    for script in soup.find_all('script'):
+        if script.contents and "runtimeConfig" in script.contents[0]:
+            try:
+                data = json.loads(script.contents[0])
+                clientId = data["runtimeConfig"]["clientId"]
+                break
+            except:
+                continue
+
+    if not clientId:
+        print("[!] Failed to get SoundCloud Client ID.")
 
     linkMail = email.replace('@','%40')
     API = await client.get(f'https://api-auth.soundcloud.com/web-auth/identifier?q={linkMail}&client_id={clientId}', headers=headers)

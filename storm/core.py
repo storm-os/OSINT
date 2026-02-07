@@ -5,7 +5,7 @@ import pkgutil
 import re
 import time
 from termcolor import colored
-from holehe.instruments import TrioProgress
+from storm.instruments import TrioProgress
 
 EMAIL_FORMAT = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 

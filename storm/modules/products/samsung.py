@@ -21,15 +21,14 @@ async def samsung(email, client, out):
             headers["X-CSRF-TOKEN"] = csrf_token
         else:
             raise ValueError("Samsung Security Tokens not found")
-
-except Exception:
-    out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
+    except Exception:
+        out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,
                     "exists": False,
                     "emailrecovery": None,
                     "phoneNumber": None,
                     "others": None})
-    return None
+        return None
 
     cookies = {
         'EUAWSIAMSESSIONID': token,

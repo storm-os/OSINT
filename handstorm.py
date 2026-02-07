@@ -20,7 +20,6 @@ class StormOSModuleRunner:
         try:
             raw_data = trio.run(storm_entry, self.email)
             self.data_count(raw_data)
-            print(raw_data[92300:92500])
         except Exception as e:
             print(f"[!] ERROR: {e}")
 

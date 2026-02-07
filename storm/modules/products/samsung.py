@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def samsung(email, client, out):
@@ -8,11 +8,28 @@ async def samsung(email, client, out):
     method = "password recovery"
     frequent_rate_limit=False
 
-    req = await client.get(
-        "https://account.samsung.com/accounts/v1/Samsung_com_FR/signUp")
-    token = req.text.split("sJSESSIONID")[1].split('"')[1].split('"')[0]
+    try:
+        req = await client.get("https://account.samsung.com/accounts/v1/Samsung_com_FR/signUp")
+    
+        session_match = re.search(r'sJSESSIONID["\']?\s*[:=]\s*["\']([^"\']+)', req.text)
+        s_session_id = session_match.group(1) if session_match else None
+    
+        csrf_match = re.search(r"['\"]?token['\"]?\s*:\s*['\"]([^'\"]+)", req.text)
+        csrf_token = csrf_match.group(1) if csrf_match else None
 
-    crsf = req.text.split("{'token' : '")[1].split("'")[0]
+        if s_session_id and csrf_token:
+            headers["X-CSRF-TOKEN"] = csrf_token
+        else:
+            raise ValueError("Samsung Security Tokens not found")
+
+except Exception:
+    out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
+                    "rateLimit": True,
+                    "exists": False,
+                    "emailrecovery": None,
+                    "phoneNumber": None,
+                    "others": None})
+    return None
 
     cookies = {
         'EUAWSIAMSESSIONID': token,

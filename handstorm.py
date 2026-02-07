@@ -9,7 +9,7 @@ class StormOSModuleRunner:
     """
     def run_module(options):
         """This logic relates to Storm Framework commands and inputs."""
-        email = run.options("EMAIL")
+        email = set_options("EMAIL")
 
         try:
             raw_data = trio.run(storm_entry, email)

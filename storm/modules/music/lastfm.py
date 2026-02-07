@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def lastfm(email, client, out):
@@ -10,7 +10,14 @@ async def lastfm(email, client, out):
 
     try:
         req = await client.get("https://www.last.fm/join")
-        token = req.cookies["csrftoken"]
+        token = req.cookies.get("csrftoken")
+
+        if not token:
+            match = re.search(r'name="csrfmiddlewaretoken"\s+value="([^"]+)"', req.text)
+            token = match.group(1) if match else None
+
+        if not token:
+            raise ValueError("CSRF Token not found in cookies or HTML")
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

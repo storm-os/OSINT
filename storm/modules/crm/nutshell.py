@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def nutshell(email, client, out):

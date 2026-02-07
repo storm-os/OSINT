@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def buymeacoffee(email, client, out):
@@ -24,7 +24,13 @@ async def buymeacoffee(email, client, out):
     r = await client.get("https://www.buymeacoffee.com/", headers=headers)
     if r.status_code == 200:
         soup = BeautifulSoup(r.content, features="html.parser")
-        csrf_token = soup.find(attrs={'name': 'bmc_csrf_token'}).get("value")
+        token_element = soup.find(attrs={'name': 'bmc_csrf_token'})
+    
+        if token_element:
+            csrf_token = token_element.get("value")
+        else:
+            print(f"[!] BMC token element not found.")
+            return None
     else:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

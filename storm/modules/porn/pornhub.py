@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def pornhub(email, client, out):
@@ -28,7 +28,12 @@ async def pornhub(email, client, out):
         return None
     soup = BeautifulSoup(req.content, features="html.parser")
     try:
-        toe = soup.find(attrs={"name": "token"}).get("value")
+        token_element = soup.find("input", attrs={"name": "token"})
+    
+        if token_element and token_element.get("value"):
+            toe = token_element.get("value")
+        else:
+            raise ValueError("Pornhub Token not found - Possible Bot Detection")
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

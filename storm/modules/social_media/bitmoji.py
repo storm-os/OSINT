@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def bitmoji(email, client, out):
@@ -9,9 +9,20 @@ async def bitmoji(email, client, out):
     frequent_rate_limit=False
 
     try:
-        req = await client.get("https://accounts.snapchat.com")
-        xsrf = req.text.split('data-xsrf="')[1].split('"')[0]
-        webClientId = req.text.split('ata-web-client-id="')[1].split('"')[0]
+        req = await client.get("https://accounts.snapchat.com", headers=headers)
+        
+        xsrf_match = re.search(r'data-xsrf=["\']([^"\']+)["\']', req.text)
+        client_id_match = re.search(r'data-web-client-id=["\']([^"\']+)["\']', req.text)
+    
+        if xsrf_match and client_id_match:
+            xsrf = xsrf_match.group(1)
+            web_client_id = client_id_match.group(1)
+            
+            headers["X-XSRF-TOKEN"] = xsrf
+            headers["X-Web-Client-Id"] = web_client_id
+        else:
+            raise ValueError("Snapchat/Bitmoji security tokens not found")
+            
         url = "https://accounts.snapchat.com/accounts/merlin/login"
         headers = {
             "Host": "accounts.snapchat.com",

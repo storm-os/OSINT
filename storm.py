@@ -5,7 +5,7 @@ from holehe.core import storm_entry
 
 class StormOSModuleRunner:
     """
-    Class ini mensimulasikan logika 'use', 'set', dan 'run' di StormOS.
+    This class can only be run on Storm Framework
     """
     def __init__(self):
         self.options = {
@@ -17,24 +17,18 @@ class StormOSModuleRunner:
         }
 
     def run_module(self):
-        """Logika perintah 'run' di StormOS"""
+        """This logic relates to Storm Framework commands and inputs."""
         email = self.options['EMAIL']['value']
-
-        if not email:
-            print("[-] Error: Option EMAIL harus diisi sebelum menjalankan 'run'!")
-            return
-
-        print(f"[*] Menjalankan OSINT Engine pada target: {email}")
 
         try:
             raw_data = trio.run(storm_entry, email)
-            self.save_to_big_data(raw_data)
+            self.data_count(raw_data)
         except Exception as e:
-            print(f"[!] Terjadi kesalahan saat eksekusi: {e}")
+            print(f"[!] ERROR: {e}")
 
-    def save_to_big_data(self, data):
-        """Logika khusus untuk berinteraksi dengan server"""
+    def data_count(self, data):
+        """Logic for calculating how many results are found"""
         detected_count = len([x for x in data if x['exists']])
-        print(f"[*] Sinkronisasi {detected_count} temuan ke data center")
+        print(f"[*] Synchronization: {detected_count}.")
         pass
 

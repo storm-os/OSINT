@@ -1,7 +1,7 @@
 import trio
 import sys
 
-from holehe.core import storm_entry
+from storm.core import storm_entry
 
 class StormOSModuleRunner:
     """

@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def zoho(email, client, out):
@@ -20,7 +20,14 @@ async def zoho(email, client, out):
     }
 
     response = await client.get("https://accounts.zoho.com/register", headers=headers)
-    headers['X-ZCSRF-TOKEN']='iamcsrcoo='+response.cookies["iamcsr"]
+    iamcsr_cookie = response.cookies.get("iamcsr")
+
+    if iamcsr_cookie:
+        # Set headers with cookie synchronization
+        headers['X-ZCSRF-TOKEN'] = f"iamcsrcoo={iamcsr_cookie}"
+    else:
+        print("[!] Zoho CSRF Cookie (iamcsr) not found. Check your connection.")
+        headers['X-ZCSRF-TOKEN'] = "null" 
 
     data = {
       'mode': 'primary',

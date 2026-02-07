@@ -1,6 +1,23 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
+import html
 
+def smart_extract(response_text, keys=["csrf_token", "csrfToken", "csrf-token", "token"]):
+    """
+    Ekstraktor cerdas untuk mengambil token dari berbagai format (JSON, HTML, atau Entities).
+    """
+    # 1. Normalize HTML
+    clean_text = html.unescape(response_text)
+    
+    for key in keys:
+        # This regex searches for a key, ignoring spaces, quotes, and finds its value.
+        pattern = rf'{key}["\']?\s*[:=]\s*["\']?([^"\'\s&>]+)'
+        match = re.search(pattern, clean_text, re.IGNORECASE)
+        if match:
+            return match.group(1)
+            
+    return None
+    
 
 async def aboutme(email, client, out):
     name = "aboutme"
@@ -9,8 +26,13 @@ async def aboutme(email, client, out):
     frequent_rate_limit=False
 
     try:
-        reqToken = await client.get("https://about.me/signup", headers={'User-Agent': random.choice(
-            ua["browsers"]["firefox"])})
+        reqToken = await client.get("https://about.me/signup", headers=my_headers)
+        token = smart_extract(reqToken.text, keys=["csrf", "token", "_token"])
+
+        if token:
+            print(f"[+] Token found: {token}")
+        else:
+            print("[!] Failed to get token. Probably blocked by WAF.")
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

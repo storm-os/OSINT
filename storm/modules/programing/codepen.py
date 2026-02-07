@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def codepen(email, client, out):
@@ -21,12 +21,15 @@ async def codepen(email, client, out):
         'TE': 'Trailers',
     }
     try:
-        req = await client.get(
-            "https://codepen.io/accounts/signup/user/free",
-            headers=headers)
-        soup = BeautifulSoup(req.content, features="html.parser")
-        token = soup.find(attrs={"name": "csrf-token"}).get("content")
-        headers["X-CSRF-Token"] = token
+        req = await client.get("https://codepen.io/accounts/signup/user/free", headers=headers)
+        soup = BeautifulSoup(req.content, "html.parser") 
+        tag = soup.find("meta", attrs={"name": "csrf-token"})
+    
+        if tag and tag.get("content"):
+            token = tag.get("content")
+            headers["X-CSRF-Token"] = token
+        else:
+            raise ValueError("CodePen CSRF Token not found in Meta Tags")
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

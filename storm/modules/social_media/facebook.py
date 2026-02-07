@@ -1,4 +1,4 @@
-from holehe.localuseragent import ua
+from storm.localuseragent import ua
 import random
 import string
 import requests  # Adjust if using a different HTTP library
@@ -20,11 +20,20 @@ async def facebook(email, client, out):
 
     try:
         response = await client.get("https://www.facebook.com/accounts/emailsignup/", headers=headers)
-        if response.status_code == 404:
-            raise Exception("Endpoint not found")
+        
+        if "checkpoint" in str(response.url):
+            raise Exception("Detected by Facebook (Security Checkpoint)")
 
-        # Extract CSRF token from the response
-        token = response.text.split('{"config":{"csrf_token":"')[1].split('"')[0]
+        token_match = re.search(r'["\']csrf_token["\']\s*:\s*["\']([^"\']+)["\']', response.text)
+        lsd_match = re.search(r'["\']LSD["\']\s*,\s*\[\s*\]\s*,\s*\{["\']token["\']\s*:\s*["\']([^"\']+)["\']', response.text)
+
+        if token_match:
+            csrf_token = token_match.group(1)
+            lsd_token = lsd_match.group(1) if lsd_match else None
+        
+            headers["X-FB-LSD"] = lsd_token
+        else:
+            raise ValueError("Facebook CSRF Token not found.")
     except Exception as e:
         print(f"Error occurred while fetching CSRF token: {e}")
         out.append({"name": name, "domain": domain, "method": method, "frequent_rate_limit": frequent_rate_limit,

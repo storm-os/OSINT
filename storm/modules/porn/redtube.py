@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def redtube(email, client, out):
@@ -21,7 +21,14 @@ async def redtube(email, client, out):
     r = await client.get("https://redtube.com/register", headers=headers)
     soup = BeautifulSoup(r.text, features="html.parser")
     try:
-        token = soup.find(attrs={"id": "token"}).get("value")
+        token_element = soup.find(attrs={"id": "token"}) or soup.find(attrs={"name": "token"})
+        if not token_element:
+            raise ValueError("Token element not found")   
+            
+        token = token_element.get("value") 
+        if not token:
+            raise ValueError("Value attribute is empty")
+            
         if token is None:
             out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                         "rateLimit": True,

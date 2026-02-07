@@ -34,8 +34,7 @@ async def facebook(email, client, out):
             headers["X-FB-LSD"] = lsd_token
         else:
             raise ValueError("Facebook CSRF Token not found.")
-    except Exception as e:
-        print(f"Error occurred while fetching CSRF token: {e}")
+    except Exception:
         out.append({"name": name, "domain": domain, "method": method, "frequent_rate_limit": frequent_rate_limit,
                     "rateLimit": True,
                     "exists": False,

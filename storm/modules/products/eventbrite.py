@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def eventbrite(email, client, out):
@@ -21,8 +21,17 @@ async def eventbrite(email, client, out):
     }
 
     try:
-        req = await client.get("https://www.eventbrite.com/signin/?referrer=%2F", headers=headers)
-        csrf_token = req.cookies["csrftoken"]
+        req = await client.get("https://www.eventbrite.com/signin/", headers=headers)
+        csrf_token = client.cookies.get("csrftoken")
+
+        if not csrf_token:
+            match = re.search(r'name="csrfmiddlewaretoken"\s+value="([^"]+)"', req.text)
+            csrf_token = match.group(1) if match else None
+
+        if csrf_token:
+            headers["X-CSRFToken"] = csrf_token
+        else:
+            raise ValueError("Eventbrite CSRF Token missing")
 
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,

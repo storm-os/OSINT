@@ -1,18 +1,6 @@
 from storm.core import *
 from storm.localuseragent import *
 
-
-def deep_csrf_search(html_content):
-    patterns = [
-        r'csrf-token"\s+content="([^"]+)"',
-        r'content="([^"]+)"\s+name="csrf-token"',
-        r'csrf_token["\']?\s*[:=]\s*["\']([^"\']+)'
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, html_content)
-        if match:
-            return match.group(1)
-    return None
     
 async def tunefind(email, client, out):
     name = "tunefind"

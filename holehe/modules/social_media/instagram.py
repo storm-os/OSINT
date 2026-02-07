@@ -19,7 +19,16 @@ async def instagram(email, client, out):
 
     try:
         freq = await client.get("https://www.instagram.com/accounts/emailsignup/", headers=headers)
-        token = freq.text.split('{\\"config\\":{\\"csrf_token\\":\\"')[1].split('\\"')[0]
+        csrf_match = re.search(r'csrf_token["\']\s*:\s*["\']([^"\']+)', freq.text)
+        if csrf_match:
+            token = csrf_match.group(1)
+        else:
+            # If it fails, try the backup pattern for the latest Instagram.
+            token_alt = re.search(r'\"csrf_token\":\"(.*?)\"', freq.text)
+            token = token_alt.group(1) if token_alt else None
+
+        if not token:
+            print("[!] Instagram Security Updated. CSRF Token missing.")
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

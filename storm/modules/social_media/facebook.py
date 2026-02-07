@@ -2,6 +2,7 @@ from storm.localuseragent import *
 from storm.core import *
 import random
 import string
+import re
 import requests  # Adjust if using a different HTTP library
 
 async def facebook(email, client, out):
@@ -89,8 +90,7 @@ async def facebook(email, client, out):
                         "emailrecovery": None,
                         "phoneNumber": None,
                         "others": None})
-    except Exception as e:
-        print(f"Error occurred during POST request: {e}")
+    except Exception:
         out.append({"name": name, "domain": domain, "method": method, "frequent_rate_limit": frequent_rate_limit,
                     "rateLimit": True,
                     "exists": False,

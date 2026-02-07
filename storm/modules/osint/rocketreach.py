@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def rocketreach(email, client, out):
@@ -21,10 +21,12 @@ async def rocketreach(email, client, out):
     try:
         response = await client.get("https://rocketreach.co/signup")
 
-        token =  re.search(r'name="csrfmiddlewaretoken" value="(.*)"', response.text).group(1)
-        headers["x-csrftoken"] = token
-
-    
+        match = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', response.text)
+        if match:
+            token = match.group(1)
+            headers["x-csrftoken"] = token
+        else:
+            raise ValueError("CSRF Token not found")
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

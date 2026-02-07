@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import ua
+from storm.core import *
+from storm.localuseragent import ua
 
 
 async def seoclerks(email, client, out):
@@ -20,10 +20,23 @@ async def seoclerks(email, client, out):
 
     r = await client.get('https://www.seoclerks.com', headers=headers)
     try:
-        if "token" in r.text:
+        token = None
+        cr = None
+        
+        if 'name="token"' in r.text or 'token" value="' in r.text:
+        try:
             token = r.text.split('token" value="')[1].split('"')[0]
-        if "__cr" in r.text:
+        except IndexError:
+            pass
+        if 'name="__cr"' in r.text or '__cr" value="' in r.text:
+        try:
             cr = r.text.split('__cr" value="')[1].split('"')[0]
+        except IndexError:
+            pass
+        if token and cr:
+            pass
+        else:
+            print("[!] SEOClerks: Failed to extract security tokens.")
     except Exception:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,

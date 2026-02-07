@@ -1,5 +1,5 @@
-from holehe.core import *
-from holehe.localuseragent import *
+from storm.core import *
+from storm.localuseragent import *
 
 
 async def ebay(email, client, out):
@@ -17,9 +17,13 @@ async def ebay(email, client, out):
         'Connection': 'keep-alive',
     }
     try:
-        req = await client.get(
-            "https://www.ebay.com/signin/", headers=headers)
-        srt = req.text.split('"csrfAjaxToken":"')[1].split('"')[0]
+        req = await client.get("https://www.ebay.com/signin/", headers=headers) 
+        token_match = re.search(r'["\']csrfAjaxToken["\']\s*:\s*["\']([^"\']+)["\']', req.text)  
+        if token_match:
+            srt = token_match.group(1)
+            headers["X-EBAY-CSRF-TOKEN"] = srt 
+        else:
+            raise ValueError("eBay CSRF Token not found - Possible security challenge")
     except IndexError:
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": True,
@@ -52,3 +56,4 @@ async def ebay(email, client, out):
                     "emailrecovery": None,
                     "phoneNumber": None,
                     "others": None})
+

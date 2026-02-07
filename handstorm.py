@@ -7,12 +7,18 @@ class StormOSModuleRunner:
     """
     This class can only be run on Storm Framework
     """
-    def run_module(options):
-        """This logic relates to Storm Framework commands and inputs."""
-        email = set_options("EMAIL")
+    def __init__(self):
+        self.email = None
 
+    def set_options(self, mail):
+        self.email = mail
+        
+    def run_module(self):
+        """
+        This logic relates to Storm Framework commands and inputs.
+        """
         try:
-            raw_data = trio.run(storm_entry, email)
+            raw_data = trio.run(storm_entry, self.email)
             self.data_count(raw_data)
         except Exception as e:
             print(f"[!] ERROR: {e}")

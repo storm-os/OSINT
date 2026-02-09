@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='osint-storm',
-    version="1.61",
+    version="2",
     packages=find_packages(where="."),
     author="megadose (Modified for StormOS)",
     install_requires=[

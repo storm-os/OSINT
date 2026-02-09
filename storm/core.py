@@ -77,7 +77,7 @@ async def storm_entry(email):
     This logic is connected to storm.py in the root folder.
     """
     if not bool(re.fullmatch(EMAIL_FORMAT, email)):
-        print("[-] Format Email Salah!")
+        print("[-] Incorrect Email Format!")
         return
 
     args = StormArgs()

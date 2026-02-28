@@ -11,7 +11,6 @@ setup(
         "bs4",
         "httpx",
         "trio",
-        "colorama",
         "tqdm"
     ],
     description="This OSINT is just a separate module from Storm Framework.",

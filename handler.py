@@ -3,7 +3,7 @@ import sys
 
 from storm.core import storm_entry
 
-class StormOSModuleRunner:
+class ModuleRunner:
     """
     This class can only be run on Storm Framework
     """

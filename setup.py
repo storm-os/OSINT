@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='osint-storm',
+    name='storm',
     version="2",
     packages=find_packages(where="."),
     author="megadose (Modified for StormOS)",
